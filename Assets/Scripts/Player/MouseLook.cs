@@ -13,9 +13,7 @@ public class MouseLook : MonoBehaviour {
     void Update () {
         Rotation.x += Input.GetAxis("Mouse X");
         Rotation.y += Input.GetAxis("Mouse Y");
-        Debug.LogFormat("b4 x: {0}, y: {1}", Rotation.x, Rotation.y);
         Rotation.y = Mathf.Clamp(Rotation.y, MinimumYDeg, MaximumYDeg);
-        Debug.LogFormat("aftr x: {0}, y: {1}", Rotation.x, Rotation.y);
         transform.localEulerAngles = new Vector3(0, Rotation.x * LookSpeed, Rotation.y * LookSpeed);
     }
 }

@@ -54,7 +54,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4504190916697390}
   - component: {fileID: 114030779821634606}
-  - component: {fileID: 114223355137380676}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -73,6 +72,7 @@ GameObject:
   - component: {fileID: 33089753575590392}
   - component: {fileID: 23683193684503798}
   - component: {fileID: 65415436454822402}
+  - component: {fileID: 114271597302378564}
   m_Layer: 0
   m_Name: PlayerHead
   m_TagString: Untagged
@@ -114,7 +114,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1859243543621316}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 0.5, y: 1, z: 1.5}
   m_Children:
@@ -282,18 +282,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b3bf53b0bf4b6640a7381c90f214167, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114223355137380676
+  PlayerHead: {fileID: 1859243543621316}
+  Speed: 2
+--- !u!114 &114271597302378564
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1435418966207176}
+  m_GameObject: {fileID: 1859243543621316}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99751123d61091f4ea6081a319e4153b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 1435418966207176}
+  LookSpeed: 2
 --- !u!136 &136459917734911974
 CapsuleCollider:
   m_ObjectHideFlags: 1
