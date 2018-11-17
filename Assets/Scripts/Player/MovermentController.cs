@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class MovermentController : MonoBehaviour {
     public GameObject PlayerHead;
+    public GameObject PlayerTorso;
     public float Speed = 2.0f; 
-    void Start() {
-    }
 
     void Update() {
         if (Input.GetKey(KeyCode.W)) {
-
             gameObject.transform.localPosition += PlayerHead.transform.right * Speed * Time.deltaTime;
         }
         if (Input.GetKey(KeyCode.S)) {
@@ -22,5 +20,9 @@ public class MovermentController : MonoBehaviour {
         if (Input.GetKey(KeyCode.D)) {
             gameObject.transform.localPosition -= PlayerHead.transform.forward * Speed * Time.deltaTime;
         }
+        if (Input.GetKey(KeyCode.Space)) {
+
+        }
     }
+
 }
