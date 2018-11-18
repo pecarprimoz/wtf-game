@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class MovermentController : MonoBehaviour {
     public GameObject PlayerHead;
+    public GameObject PlayerLegs;
     public float Speed = 2.0f;
 
-    private bool SetPerfectAngles = false;
-    // Allow 2 deg as a soft spot to reset angles
-    private float AngleSoftSpot = 2.0f;
-    // Player can't move when hes getting up
+    private float PlayerHalfHeight = 2f;
     private bool CanMove = true;
-    // ((Mathf.Abs(gameObject.transform.localEulerAngles.z) - AngleSoftSpot) < 0) || ((Mathf.Abs(gameObject.transform.localEulerAngles.z) + AngleSoftSpot) > 360)
+    private bool CanJump = true;
+    private bool PlayerIsJumping = false;
+    private float MaxPlayerJump;
+    private float JumpTimer;
+    private void Start() {
+        MaxPlayerJump = 2 * gameObject.transform.localPosition.y;
+        JumpTimer = 0.0f;
+    }
     void Update() {
+        if (PlayerIsJumping) {
+            var lerpJump = Mathf.Lerp(gameObject.transform.localPosition.y, MaxPlayerJump, Speed * Time.deltaTime);
+            var playerJumpPosition = new Vector3(gameObject.transform.localPosition.x, lerpJump, gameObject.transform.localPosition.z);
+            gameObject.transform.localPosition = playerJumpPosition;
+        }
         if (CanMove) {
             if (Input.GetKey(KeyCode.W)) {
                 gameObject.transform.localPosition += PlayerHead.transform.right * Speed * Time.deltaTime;
@@ -26,55 +36,40 @@ public class MovermentController : MonoBehaviour {
             if (Input.GetKey(KeyCode.D)) {
                 gameObject.transform.localPosition -= PlayerHead.transform.forward * Speed * Time.deltaTime;
             }
-            if (Input.GetKey(KeyCode.Space)) {
-                if (!SetPerfectAngles) {
-                    var beginFallTransition = false;
-                    var gameObjectAngles = gameObject.transform.localEulerAngles;
-                    if (gameObjectAngles.x != 0) {
-                        if (Mathf.Abs(gameObjectAngles.x) + 1 > 90) {
-                            beginFallTransition = true;
-                        }
-                    } else if (gameObjectAngles.z != 0) {
-                        if (Mathf.Abs(gameObjectAngles.z) + 1 > 90) {
-                            beginFallTransition = true;
-                        }
-                    }
-                    if (beginFallTransition) {
-                        gameObject.GetComponent<Rigidbody>().useGravity = false;
-                        gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-                        SetPerfectAngles = true;
-                        CanMove = false;
-                    }
+            if (Input.GetKeyDown(KeyCode.Space)) {
+                if (CanJump) {
+                    gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
+                    CanJump = false;
+                    gameObject.GetComponent<Rigidbody>().useGravity = false;
+                    PlayerIsJumping = true;
                 }
             }
         }
-        if (SetPerfectAngles) {
-            // todo refac this shit code
-            var endFallTransition = false;
-            var gameObjectAngles = gameObject.transform.localEulerAngles;
-            var lerpedRotationX = Mathf.LerpAngle(gameObjectAngles.x, 0, Speed * Time.deltaTime);
-            var lerpedRotationZ = Mathf.LerpAngle(gameObjectAngles.z, 0, Speed * Time.deltaTime);
-            var lerpedPositionY = Mathf.Lerp(gameObject.transform.localPosition.y, 0, Speed * Time.deltaTime);
-            gameObject.transform.localEulerAngles = new Vector3(lerpedRotationX, 0, lerpedRotationZ);
-            gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, lerpedPositionY, gameObject.transform.localPosition.z);
-            if (gameObjectAngles.x != 0) {
-                if ((Mathf.Abs(gameObject.transform.localRotation.eulerAngles.x) - AngleSoftSpot < AngleSoftSpot)) {
-                    endFallTransition = true;
-                }
-            } else if (gameObjectAngles.z != 0) {
-                if ((Mathf.Abs(gameObject.transform.localRotation.eulerAngles.z) - AngleSoftSpot < AngleSoftSpot)) {
-                    endFallTransition = true;
-                }
-            }
-            if (endFallTransition) {
-                gameObject.transform.localEulerAngles = new Vector3(0, 0, 0);
-                gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x, 0, gameObject.transform.localPosition.z);
-                gameObject.GetComponent<Rigidbody>().useGravity = true;
-                SetPerfectAngles = false;
-                gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationY;
-                CanMove = true;
-            }
+        JumpTimer += Time.deltaTime;
+        if (!PlayerIsJumping) {
+            CheckIfPlayerOnTheGround();
         }
-
+        CheckIfPlayerIsFinishedJumping();
+    }
+    private bool CheckIfPlayerHasFallen() {
+        return false;
+    }
+    private void CheckIfPlayerIsFinishedJumping() {
+        if (JumpTimer > 1.5f) {
+            JumpTimer = 0;
+            PlayerIsJumping = false;
+            gameObject.GetComponent<Rigidbody>().useGravity = true;
+        }
+    }
+    private void CheckIfPlayerOnTheGround() {
+        gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationY;
+        var playerLegPosition = gameObject.transform.localPosition.y + PlayerLegs.transform.localPosition.y;
+        var rayStart = new Vector3(gameObject.transform.localPosition.x, playerLegPosition, gameObject.transform.localPosition.z);
+        //var vec_end = new Vector3(gameObject.transform.localPosition.x, playerLegPosition - 0.2f, gameObject.transform.localPosition.z);
+        //Debug.DrawLine(vec, vec_end, Color.red);
+        var legsRay = new Ray(rayStart, Vector3.down);
+        if (Physics.Raycast(legsRay, 0.2f)) {
+            CanJump = true;
+        }
     }
 }
