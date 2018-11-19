@@ -69,6 +69,7 @@ public class MovermentController : MonoBehaviour {
         //Debug.DrawLine(vec, vec_end, Color.red);
         var legsRay = new Ray(rayStart, Vector3.down);
         if (Physics.Raycast(legsRay, 0.2f)) {
+            MaxPlayerJump = 2 * gameObject.transform.localPosition.y;
             CanJump = true;
         }
     }
